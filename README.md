@@ -10,11 +10,11 @@ Teradata for Node.js
 
 ## Features
 
+ - Asynchronous
  - Read/Write
  - Prepared Statements
  - Connection Pool
  - Keep Alive
- - Promises
 
 ## Installation
 
@@ -77,7 +77,7 @@ var id = 7;
 var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ' + id;
 
 return teradata.read(sql)
-  .then(function(response)) {
+  .then(function(response) {
     console.log(response);
   });
 ```
@@ -88,7 +88,7 @@ var id = 7;
 var sql = 'DELETE FROM MyDatabase.MyTable WHERE Id = ' + id;
 
 return teradata.write(sql)
-  .then(function(count)) {
+  .then(function(count) {
     console.log(count);
   });
 ```
@@ -101,7 +101,7 @@ var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ?';
 return teradata.readPreparedStatement(sql, [
     teradata.createPreparedStatementParam(1, 'Int', Number(id))
   ])
-  .then(function(response)) {
+  .then(function(response) {
     console.log(response);
   });
 ```
@@ -116,7 +116,7 @@ return teradata.writePreparedStatement(sql, [
     teradata.createPreparedStatementParam(1, 'String', username),
     teradata.createPreparedStatementParam(2, 'Int', Number(id))
   ])
-  .then(function(count)) {
+  .then(function(count) {
     console.log(count);
   });
 ```
