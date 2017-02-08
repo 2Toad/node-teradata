@@ -10,11 +10,11 @@ Teradata for Node.js
 
 ## Features
 
- - Asynchronous
  - Read/Write
  - Prepared Statements
  - Connection Pool
  - Keep Alive
+ - Promises
 
 ## Installation
 
@@ -44,17 +44,17 @@ A JDBC driver is provided by Teradata for communicating with their databases via
 
 Include module
 ```js
-import Teradata from 'node-teradata';
+var Teradata = require('node-teradata');
 ```
 
 Create an instance
 ```js
-const teradata = new Teradata(config);
+var teradata = new Teradata(config);
 ```
 
 **Example Config**
 ```js
-const config = {
+var config = {
   url: 'jdbc:teradata://myserver',
   username: 'MyUsername',
   password: 'MyPassword',
@@ -73,50 +73,50 @@ const config = {
 
 #### Read
 ```js
-const id = 7;
-const sql = `SELECT * FROM MyDatabase.MyTable WHERE Id = ${id}`;
+var id = 7;
+var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ' + id;
 
 return teradata.read(sql)
-  .then(response => {
+  .then(function(response)) {
     console.log(response);
   });
 ```
 
 #### Write
 ```js
-const id = 7;
-const sql = `DELETE FROM MyDatabase.MyTable WHERE Id = ${id}`;
+var id = 7;
+var sql = 'DELETE FROM MyDatabase.MyTable WHERE Id = ' + id;
 
 return teradata.write(sql)
-  .then(count => {
+  .then(function(count)) {
     console.log(count);
   });
 ```
 
 #### Read Prepared Statement
 ```js
-const id = 7;
-const sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ?';
+var id = 7;
+var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ?';
 
 return teradata.readPreparedStatement(sql, [
     teradata.createPreparedStatementParam(1, 'Int', Number(id))
   ])
-  .then(response => {
+  .then(function(response)) {
     console.log(response);
   });
 ```
 
 #### Write Prepared Statement
 ```js
-const id = 7;
-const username = 'Foo';
-const sql = 'UPDATE MyDatabase.MyTable SET Username = ? WHERE Id = ?';
+var id = 7;
+var username = 'Foo';
+var sql = 'UPDATE MyDatabase.MyTable SET Username = ? WHERE Id = ?';
 
 return teradata.writePreparedStatement(sql, [
     teradata.createPreparedStatementParam(1, 'String', username),
     teradata.createPreparedStatementParam(2, 'Int', Number(id))
   ])
-  .then(count => {
+  .then(function(count)) {
     console.log(count);
   });
 ```
