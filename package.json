@@ -1,0 +1,29 @@
+{
+  "name": "node-teradata",
+  "version": "1.0.0",
+  "description": "Teradata for Node.js",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2Toad/node-teradata.git"
+  },
+  "keywords": [
+    "teradata"
+  ],
+  "author": "2Toad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/2Toad/node-teradata/issues"
+  },
+  "homepage": "https://github.com/2Toad/node-teradata#readme",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "bluebird": "^3.4.7",
+    "jdbc": "^0.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.15.0"
+  }
+}
