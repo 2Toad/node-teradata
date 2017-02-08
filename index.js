@@ -1,131 +1,118 @@
-var jinst = require('jdbc/lib/jinst');
-var Pool = require('jdbc/lib/pool');
-var Promise = require('bluebird');
+/*
+ * node-teradata
+ * Copyright (c) 2017 2Toad, LLC
+ * https://github.com/2Toad/node-teradata
+ *
+ * Version: 1.1.0
+ * License: MIT
+ */
 
-var log = getLogger();
+import jinst from 'jdbc/lib/jinst';
+import Pool from 'jdbc/lib/pool';
+import Promise from 'bluebird';
 
-function Teradata(config) {
-  if (!config) throw new Error('Configuration required');
-  this.config = config;
+const log = getLogger();
+
+class Teradata {
+  constructor(config) {
+    if (!config) throw new Error('Configuration required');
+    this.config = config;
+  }
+
+  read(sql) {
+    let statement;
+    let resultSet;
+
+    return createStatement.call(this)
+      .then(s => {
+        statement = s;
+        return statement.executeQueryAsync(sql);
+      })
+      .then(rs => {
+        resultSet = Promise.promisifyAll(rs);
+        return resultSet.toObjArrayAsync();
+      })
+      .then(objectArray => objectArray)
+      .catch(error => {
+        log.error(`Unable to execute query: ${sql}`);
+        throw error;
+      })
+      .finally(() => Promise.resolve(statement && statement.closeAsync())
+      .finally(() => Promise.resolve(resultSet && resultSet.closeAsync())));
+  }
+
+  write(sql) {
+    let statement;
+
+    return createStatement.call(this)
+      .then(s => {
+        statement = s;
+        return statement.executeUpdateAsync(sql);
+      })
+      .then(count => count)
+      .finally(() => Promise.resolve(statement && statement.closeAsync()));
+  }
+
+  readPreparedStatement(sql, params) {
+    let preparedStatement;
+    let resultSet;
+
+    return createPreparedStatement.call(this, sql, params)
+      .then(ps => {
+        preparedStatement = ps;
+        return preparedStatement.executeQueryAsync();
+      })
+      .then(rs => {
+        resultSet = Promise.promisifyAll(rs);
+        return resultSet.toObjArrayAsync();
+      })
+      .then(objectArray => objectArray)
+      .catch(error => {
+        log.error(`Unable to execute query: ${sql}`);
+        throw error;
+      })
+      .finally(() => Promise.resolve(preparedStatement && preparedStatement.closeAsync())
+      .finally(() => Promise.resolve(resultSet && resultSet.closeAsync())));
+  }
+
+  writePreparedStatement(sql, params) {
+    let preparedStatement;
+
+    return createPreparedStatement.call(this, sql, params)
+      .then(ps => {
+        preparedStatement = ps;
+        return preparedStatement.executeUpdateAsync();
+      })
+      .then(count => count)
+      .catch(error => {
+        log.error(`Unable to execute query: ${sql}`);
+        throw error;
+      })
+      .finally(() => Promise.resolve(preparedStatement && preparedStatement.closeAsync()));
+  }
+
+  createPreparedStatementParam(index, type, value) {
+    return {
+      index,
+      type,
+      value
+    };
+  }
+
+  closeAll() {
+    return this.pool.purgeAsync()
+      .catch(error => {
+        log.error('Unable to close all connections');
+        throw error;
+      });
+  }
 }
-
-Teradata.prototype.read = function(sql) {
-  var statement,
-    resultSet;
-
-  return createStatement.call(this)
-    .then(function(s) {
-      statement = s;
-      return statement.executeQueryAsync(sql);
-    })
-    .then(function(rs) {
-      resultSet = Promise.promisifyAll(rs);
-      return resultSet.toObjArrayAsync();
-    })
-    .then(function(objectArray) {
-      return objectArray;
-    })
-    .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
-      throw error;
-    })
-    .finally(function() {
-      return Promise.resolve(statement && statement.closeAsync())
-        .finally(function() {
-          return Promise.resolve(resultSet && resultSet.closeAsync());
-        });
-    });
-};
-
-Teradata.prototype.write = function(sql) {
-  var statement;
-
-  return createStatement.call(this)
-    .then(function(s) {
-      statement = s;
-      return statement.executeUpdateAsync(sql);
-    })
-    .then(function(count) {
-      return count;
-    })
-    .finally(function() {
-      return Promise.resolve(statement && statement.closeAsync());
-    });
-};
-
-Teradata.prototype.readPreparedStatement = function(sql, params) {
-  var preparedStatement,
-    resultSet;
-
-  return createPreparedStatement.call(this, sql, params)
-    .then(function(ps) {
-      preparedStatement = ps;
-      return preparedStatement.executeQueryAsync();
-    })
-    .then(function(rs) {
-      resultSet = Promise.promisifyAll(rs);
-      return resultSet.toObjArrayAsync();
-    })
-    .then(function(objectArray) {
-      return objectArray;
-    })
-    .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
-      throw error;
-    })
-    .finally(function() {
-      return Promise.resolve(preparedStatement && preparedStatement.closeAsync())
-        .finally(function() {
-          return Promise.resolve(resultSet && resultSet.closeAsync());
-        });
-    });
-};
-
-Teradata.prototype.writePreparedStatement = function(sql, params) {
-  var preparedStatement;
-
-  return createPreparedStatement.call(this, sql, params)
-    .then(function(ps) {
-      preparedStatement = ps;
-      return preparedStatement.executeUpdateAsync();
-    })
-    .then(function(count) {
-      return count;
-    })
-    .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
-      throw error;
-    })
-    .finally(function() {
-      return Promise.resolve(preparedStatement && preparedStatement.closeAsync());
-    });
-};
-
-Teradata.prototype.createPreparedStatementParam = function(index, type, value) {
-  return {
-    index: index,
-    type: type,
-    value: value
-  };
-};
-
-Teradata.prototype.closeAll = function() {
-  return this.pool.purgeAsync()
-    .catch(function(error) {
-      log.error('Unable to close all connections');
-      throw error;
-    });
-};
 
 function createStatement() {
   return open.call(this)
-    .then(function(connection) {
-      return connection.createStatementAsync()
-        .then(function(statement) {
-          return Promise.promisifyAll(statement);
-        });
-    })
-    .catch(function(error){
+    .then(connection => connection.createStatementAsync()
+    .then(statement => Promise.promisifyAll(statement)))
+    .catch(error => {
       log.error('Unable to create statement');
       throw error;
     });
@@ -133,68 +120,60 @@ function createStatement() {
 
 function createPreparedStatement(sql, params) {
   return open.call(this)
-    .then(function(connection) {
-      return connection.prepareStatementAsync(sql)
-        .then(function(preparedStatement) {
-          Promise.promisifyAll(preparedStatement);
+    .then(connection => connection.prepareStatementAsync(sql)
+    .then(preparedStatement => {
+      Promise.promisifyAll(preparedStatement);
 
-          return Promise.all(params.map(function(param) {
-            var setTypeAsync = 'set' + param.type + 'Async';
-            if (!preparedStatement[setTypeAsync]) throw new Error('Invalid parameter type: ' + param.type);
+      return Promise.all(params.map(param => {
+        const setTypeAsync = `set${param.type}Async`;
+        if (!preparedStatement[setTypeAsync]) throw new Error(`Invalid parameter type: ${param.type}`);
 
-            return preparedStatement[setTypeAsync](param.index, param.value);
-          }))
-          .then(function() {
-            return preparedStatement;
-          });
-        });
-    })
-    .catch(function(error){
+        return preparedStatement[setTypeAsync](param.index, param.value);
+      }))
+      .then(() => preparedStatement);
+    }))
+    .catch(error => {
       log.error('Unable to create prepared statement');
       throw error;
     });
 }
 
 function open() {
-  var connection;
+  let connection;
 
   return getConnection.call(this)
-    .then(function(conn) {
+    .then(conn => {
       connection = conn;
       return Promise.promisifyAll(connection.conn);
     })
-    .catch(function(error) {
+    .catch(error => {
       log.error('Unable to open connection');
       throw error;
     })
-    .finally(function() {
-      return close.call(this, connection);
-    }.bind(this));
+    .finally(() => close.call(this, connection));
 }
 
 function getConnection() {
   if (this.pool) return this.pool.reserveAsync();
 
   return initialize.call(this)
-    .then(function(pool) {
-      return pool.reserveAsync();
-    });
+    .then(pool => pool.reserveAsync());
 }
 
 function initialize() {
   if (this.pool) return Promise.resolve(this.pool);
 
-  var path = this.config.driver || './jars/';
+  const path = this.config.driver || './jars/';
 
   if (!jinst.isJvmCreated()) {
     jinst.addOption('-Xrs');
     jinst.setupClasspath([
-      path + 'terajdbc4.jar',
-      path + 'tdgssconfig.jar'
+      `${path}terajdbc4.jar`,
+      `${path}tdgssconfig.jar`
     ]);
   }
 
-  var jdbcConfig = {
+  const jdbcConfig = {
     url: this.config.url,
     properties: {
       user: this.config.username,
@@ -205,15 +184,15 @@ function initialize() {
     keepalive: this.config.keepalive
   };
 
-  var pool = Promise.promisifyAll(new Pool(jdbcConfig));
+  const pool = Promise.promisifyAll(new Pool(jdbcConfig));
 
   return pool.initializeAsync()
-    .then(function() {
+    .then(() => {
       this.pool = pool;
       return pool;
-    }.bind(this))
-    .catch(function(error) {
-      log.error('Unable to connect to database: ' + jdbcConfig.url);
+    })
+    .catch(error => {
+      log.error(`Unable to connect to database: ${jdbcConfig.url}`);
       throw error;
     });
 }
@@ -222,8 +201,8 @@ function close(connection) {
   if (!connection) return Promise.resolve();
 
   return this.pool.releaseAsync(connection)
-    .catch(function(error) {
-      log.error('Unable to close connection: ' + connection.uuid);
+    .catch(error => {
+      log.error(`Unable to close connection: ${connection.uuid}`);
       throw error;
     });
 }
@@ -238,4 +217,4 @@ function getLogger() {
       : global.winston || console;
 }
 
-module.exports = Teradata;
+export default Teradata;
