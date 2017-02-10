@@ -204,7 +204,7 @@ function open() {
       throw error;
     })
     .finally(function() {
-      return close.call(this, connection);
+      return release.call(this, connection);
     }.bind(this));
 }
 
@@ -258,12 +258,12 @@ function keepAlive(connection) {
     });
 }
 
-function close(connection) {
+function release(connection) {
   if (!connection) return Promise.resolve();
 
   return this.pool.releaseAsync(connection)
     .catch(function(error) {
-      log.error('Unable to close connection: ' + connection.uuid);
+      log.error('Unable to release connection: ' + connection.uuid);
       throw error;
     });
 }
