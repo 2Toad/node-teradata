@@ -10,11 +10,11 @@ Teradata for Node.js
 
 ## Features
 
- - Asynchronous
- - Read/Write
- - Prepared Statements
- - Connection Pool
- - Keep Alive
+ * Asynchronous
+ * Read/Write
+ * Prepared Statements
+ * Connection Pool
+ * Keep Alive
 
 ## Installation
 
@@ -27,8 +27,7 @@ node-teradata uses JDBC to communicate with Teradata:
 1. Download and install JDK 8 ([1.8.0 u112](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html))
 2. Make sure Java is included in your system path
 
->**NOTE**
->node-teradata may work with other versions of the JDK, but they have not been tested
+> Other versions of the JDK may work, but they have not been tested
 
 ### Teradata
 
@@ -37,8 +36,10 @@ A JDBC driver is provided by Teradata for communicating with their databases via
 1. Download the Teradata JDBC Driver ([15.10.00.33](http://downloads.teradata.com/download/connectivity/jdbc-driver))
 2. Create a "jars" folder in the root of your  app
 3. Extract the archive's contents into the folder:
-  - tdgssconfig.jar
-  - terajdbc4.jar
+  * tdgssconfig.jar
+  * terajdbc4.jar
+
+> Other versions of the Teradata JDBC Driver may work, but they have not been tested
 
 ## Usage
 
