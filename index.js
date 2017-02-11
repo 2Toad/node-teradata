@@ -133,6 +133,7 @@ Teradata.prototype.createPreparedStatementParam = function(index, type, value) {
 Teradata.prototype.closeAll = function() {
   _.each(this.connections, function(connection) {
     clearInterval(connection.keepAliveIntervalId);
+    delete connection.keepAliveIntervalId;
   });
 
   return this.pool.purgeAsync()
