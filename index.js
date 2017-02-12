@@ -28,6 +28,12 @@ function Teradata(config) {
       enabled: false
     }
   });
+
+  Object.defineProperty(this, 'initialized', {
+    get: function() {
+      return Boolean(this.pool);
+    }
+  });
 }
 
 Teradata.prototype.read = function(sql, connection) {
