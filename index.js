@@ -222,7 +222,7 @@ function initialize() {
       return pool;
     }.bind(this))
     .catch(function(error) {
-      log.error('Unable to connect to database: ' + jdbcConfig.url);
+      log.error('Unable to connect to server: ' + jdbcConfig.url);
       throw error;
     });
 }
