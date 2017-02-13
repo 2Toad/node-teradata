@@ -216,7 +216,7 @@ function open() {
 }
 
 function getConnection() {
-  if (this.pool) return this.pool.reserveAsync();
+  if (this.initialized) return this.pool.reserveAsync();
 
   return initialize.call(this)
     .then(function(pool) {
@@ -225,7 +225,7 @@ function getConnection() {
 }
 
 function initialize() {
-  if (this.pool) return Promise.resolve(this.pool);
+  if (this.initialized) return Promise.resolve(this.pool);
 
   if (!jinst.isJvmCreated()) {
     jinst.addOption('-Xrs');
