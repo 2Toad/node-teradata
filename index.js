@@ -10,19 +10,31 @@
 var jinst = require('jdbc/lib/jinst');
 var Pool = require('jdbc/lib/pool');
 var Promise = require('bluebird');
+var _ = require('lodash');
 
 var log = getLogger();
 
 function Teradata(config) {
   if (!config) throw new Error('Configuration required');
-  this.config = config;
+
+  this.connections = [];
+  this.config = _.defaultsDeep(config, {
+    driver: './jars/',
+    minPoolSize: 1,
+    maxPoolSize: 100,
+    keepalive: {
+      interval: 60000,
+      query: 'SELECT 1',
+      enabled: false
+    }
+  });
 }
 
-Teradata.prototype.read = function(sql) {
+Teradata.prototype.read = function(sql, connection) {
   var statement,
     resultSet;
 
-  return createStatement.call(this)
+  return createStatement.call(this, connection)
     .then(function(s) {
       statement = s;
       return statement.executeQueryAsync(sql);
@@ -119,6 +131,11 @@ Teradata.prototype.createPreparedStatementParam = function(index, type, value) {
 };
 
 Teradata.prototype.closeAll = function() {
+  _.each(this.connections, function(connection) {
+    clearInterval(connection.keepAliveIntervalId);
+    delete connection.keepAliveIntervalId;
+  });
+
   return this.pool.purgeAsync()
     .catch(function(error) {
       log.error('Unable to close all connections');
@@ -126,8 +143,10 @@ Teradata.prototype.closeAll = function() {
     });
 };
 
-function createStatement() {
-  return open.call(this)
+function createStatement(connection) {
+  var promise = connection && Promise.resolve(connection) || open.call(this);
+
+  return promise
     .then(function(connection) {
       return connection.createStatementAsync()
         .then(function(statement) {
@@ -168,10 +187,19 @@ function open() {
   var connection;
 
   return getConnection.call(this)
-    .then(function(conn) {
-      connection = conn;
+    .then(function(c) {
+      connection = c;
+      this.connections.push(connection);
+
       return Promise.promisifyAll(connection.conn);
-    })
+    }.bind(this))
+    .tap(function() {
+      if (connection.keepAliveIntervalId || !this.config.keepalive.enabled) return;
+
+      connection.keepAliveIntervalId = setInterval(function() {
+        keepAlive.call(this, connection.conn);
+      }.bind(this), this.config.keepalive.interval);
+    }.bind(this))
     .catch(function(error) {
       log.error('Unable to open connection');
       throw error;
@@ -193,13 +221,11 @@ function getConnection() {
 function initialize() {
   if (this.pool) return Promise.resolve(this.pool);
 
-  var path = this.config.driver || './jars/';
-
   if (!jinst.isJvmCreated()) {
     jinst.addOption('-Xrs');
     jinst.setupClasspath([
-      path + 'terajdbc4.jar',
-      path + 'tdgssconfig.jar'
+      this.config.driver + 'terajdbc4.jar',
+      this.config.driver + 'tdgssconfig.jar'
     ]);
   }
 
@@ -209,9 +235,8 @@ function initialize() {
       user: this.config.username,
       password: this.config.password
     },
-    minpoolsize: this.config.minPoolSize || 1,
-    maxpoolsize: this.config.maxPoolSize || 100,
-    keepalive: this.config.keepalive
+    minpoolsize: this.config.minPoolSize,
+    maxpoolsize: this.config.maxPoolSize
   };
 
   var pool = Promise.promisifyAll(new Pool(jdbcConfig));
@@ -224,6 +249,13 @@ function initialize() {
     .catch(function(error) {
       log.error('Unable to connect to database: ' + jdbcConfig.url);
       throw error;
+    });
+}
+
+function keepAlive(connection) {
+  return this.read(this.config.keepalive.query, connection)
+    .catch(function() {
+      log.error('Keep Alive failed');
     });
 }
 
