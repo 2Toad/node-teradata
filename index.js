@@ -10,9 +10,8 @@
 var jinst = require('jdbc/lib/jinst');
 var Pool = require('jdbc/lib/pool');
 var Promise = require('bluebird');
+var log = require('./lib/logger');
 var _ = require('lodash');
-
-var log = getLogger();
 
 function Teradata(config) {
   if (!config) throw new Error('Configuration required');
@@ -26,8 +25,13 @@ function Teradata(config) {
       interval: 60000,
       query: 'SELECT 1',
       enabled: false
+    },
+    logger: {
+      level: 'error'
     }
   });
+
+  log.configure(this.config.logger);
 
   Object.defineProperty(this, 'initialized', {
     get: function() {
@@ -53,7 +57,7 @@ Teradata.prototype.read = function(sql, connection) {
       return objectArray;
     })
     .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
+      log.error('Unable to execute query: %s', sql);
       throw error;
     })
     .finally(function() {
@@ -97,7 +101,7 @@ Teradata.prototype.readPreparedStatement = function(sql, params) {
       return objectArray;
     })
     .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
+      log.error('Unable to execute query: %s', sql);
       throw error;
     })
     .finally(function() {
@@ -120,7 +124,7 @@ Teradata.prototype.writePreparedStatement = function(sql, params) {
       return count;
     })
     .catch(function(error) {
-      log.error('Unable to execute query: ' + sql);
+      log.error('Unable to execute query: %s', sql);
       throw error;
     })
     .finally(function() {
@@ -253,13 +257,16 @@ function initialize() {
       return pool;
     }.bind(this))
     .catch(function(error) {
-      log.error('Unable to connect to server: ' + jdbcConfig.url);
+      log.error('Unable to connect to server: %s', jdbcConfig.url);
       throw error;
     });
 }
 
 function keepAlive(connection) {
   return this.read(this.config.keepalive.query, connection)
+    .tap(function() {
+      log.debug('Keep Alive');
+    })
     .catch(function() {
       log.error('Keep Alive failed');
     });
@@ -270,19 +277,9 @@ function release(connection) {
 
   return this.pool.releaseAsync(connection)
     .catch(function(error) {
-      log.error('Unable to release connection: ' + connection.uuid);
+      log.error('Unable to release connection: %s', connection.uuid);
       throw error;
     });
-}
-
-// Make use of global logger if available (e.g., Winston),
-// otherwise fallback to console
-function getLogger() {
-  return global.logger && typeof global.logger.error === 'function'
-    ? global.logger
-    : global.log && typeof global.log.error === 'function'
-      ? global.log
-      : global.winston || console;
 }
 
 module.exports = Teradata;
