@@ -11,10 +11,10 @@ The node-teradata constructor requires a config object:
 | driver      | string | Location of the Teradata JDBC Driver                                                                                           | ./jars/   |
 | minPoolSize | number | The number of connections to fill the pool with when the lib is initialized                                                    | 1         |
 | maxPoolSize | number | When a connection is requested, and the pool is empty, a new connection will be added to the pool until this number is reached | 100       |
-| keepalive   | object | (see [keepAlive Properties](#keepalive-properties))                                                                            | ---       |
+| keepAlive   | object | (see [keepAlive Properties](#keepalive-properties))                                                                            | ---       |
 | logger      | object | (see [logger Properties](#logger-properties))                                                                                  | ---       |
 
-### keepalive Properties
+### keepAlive Properties
 | Property | Type    | Details                                             | Default       |
 |----------|---------|-----------------------------------------------------|---------------|
 | interval | number  | The number of milliseconds between query executions | 60000         |
@@ -37,7 +37,7 @@ var config = {
   driver: './jars/',
   minPoolSize: 1,
   maxPoolSize: 100,
-  keepalive: {
+  keepAlive: {
     interval: 60000,
     query: 'SELECT 1',
     enabled: true
