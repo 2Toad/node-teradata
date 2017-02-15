@@ -31,7 +31,7 @@ function Teradata(config) {
     }
   });
 
-  log.configure(this.config.logger);
+  log.init(this.config.logger);
 
   Object.defineProperty(this, 'initialized', {
     get: function() {
