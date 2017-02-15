@@ -36,8 +36,8 @@ A JDBC driver is provided by Teradata for communicating with their databases via
 1. Download the Teradata JDBC Driver ([15.10.00.33](http://downloads.teradata.com/download/connectivity/jdbc-driver))
 2. Create a "jars" folder in the root of your  app
 3. Extract the archive's contents into the folder:
-  * tdgssconfig.jar
-  * terajdbc4.jar
+    * tdgssconfig.jar
+    * terajdbc4.jar
 
 > Other versions of the Teradata JDBC Driver may work, but they have not been tested
 
@@ -62,9 +62,8 @@ var config = {
   driver: './jars/',
   minPoolSize: 1,
   maxPoolSize: 100,
-  keepalive: {
+  keepAlive: {
     interval: 60000,
-    query: 'SELECT 1',
     enabled: true
   }
 };
