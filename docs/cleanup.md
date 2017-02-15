@@ -13,13 +13,14 @@ In this example we use [node-cleanup](https://www.npmjs.com/package/node-cleanup
 ```js
 var teradata = new Teradata(config);
 ```
+
 ...
 
 ```js
 var cleanup = require('node-cleanup');
 
 cleanup(function(exitCode, signal) {
-  if (!signal || !teradata.pool) return;
+  if (!signal || !teradata.initialized) return;
 
   teradata.closeAll()
     .then(function() {
