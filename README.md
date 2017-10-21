@@ -121,3 +121,7 @@ return teradata.writePreparedStatement(sql, [
     console.log(count);
   });
 ```
+
+---
+
+See the [docs](https://github.com/2Toad/node-teradata/tree/master/docs) for more information
