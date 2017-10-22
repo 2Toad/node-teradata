@@ -95,6 +95,8 @@ return teradata.write(sql)
 ```
 
 #### Read Prepared Statement
+
+##### Anonymous Parameters
 ```js
 var id = 7;
 var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = ?';
@@ -107,7 +109,22 @@ return teradata.readPreparedStatement(sql, [
   });
 ```
 
+##### Named Parameters
+```js
+var id = 7;
+var sql = 'SELECT * FROM MyDatabase.MyTable WHERE Id = :id';
+
+return teradata.readPreparedStatement(sql, [
+    teradata.createPreparedStatementParam('id', 'Int', Number(id))
+  ])
+  .then(function(response) {
+    console.log(response);
+  });
+```
+
 #### Write Prepared Statement
+
+##### Anonymous Parameters
 ```js
 var id = 7;
 var username = 'Foo';
@@ -116,6 +133,22 @@ var sql = 'UPDATE MyDatabase.MyTable SET Username = ? WHERE Id = ?';
 return teradata.writePreparedStatement(sql, [
     teradata.createPreparedStatementParam(1, 'String', username),
     teradata.createPreparedStatementParam(2, 'Int', Number(id))
+  ])
+  .then(function(count) {
+    console.log(count);
+  });
+```
+
+##### Named Parameters
+
+```js
+var id = 7;
+var username = 'Foo';
+var sql = 'UPDATE MyDatabase.MyTable SET Username = :username WHERE Id = :id;
+
+return teradata.writePreparedStatement(sql, [
+    teradata.createPreparedStatementParam('id', 'Int', Number(id)),
+    teradata.createPreparedStatementParam('username', 'String', username)
   ])
   .then(function(count) {
     console.log(count);
