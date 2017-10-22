@@ -144,7 +144,7 @@ return teradata.writePreparedStatement(sql, [
 ```js
 var id = 7;
 var username = 'Foo';
-var sql = 'UPDATE MyDatabase.MyTable SET Username = :username WHERE Id = :id;
+var sql = 'UPDATE MyDatabase.MyTable SET Username = :username WHERE Id = :id';
 
 return teradata.writePreparedStatement(sql, [
     teradata.createPreparedStatementParam('id', 'Int', Number(id)),
