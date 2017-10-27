@@ -89,7 +89,6 @@
         "max-len": "off",
         "max-nested-callbacks": "error",
         "max-params": "error",
-        "max-statements": "error",
         "max-statements-per-line": "error",
         "multiline-ternary": [
             "error",
