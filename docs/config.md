@@ -13,7 +13,7 @@ The node-teradata constructor requires a config object:
 | maxPoolSize | number | When a connection is requested, and the pool is empty, a new connection will be added to the pool until this number is reached | 100       |
 | keepalive   | object | (see [keepAlive Properties](#keepalive-properties))                                                                            | ---       |
 | logger      | object | (see [logger Properties](#logger-properties))                                                                                  | ---       |
-| jvmOptions  | array  | An array of strings of jvm options (Your array will not be merged with the default array, it will replace it)                  | ---       |
+| jvmOptions  | array  | An array of strings of jvm options (Your array will not be merged with the default array, it will replace it)                  | ['-Xrs']  |
 
 ### keepalive Properties
 | Property | Type    | Details                                             | Default       |
