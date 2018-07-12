@@ -66,7 +66,8 @@ var config = {
     interval: 60000,
     query: 'SELECT 1',
     enabled: true
-  }
+  },
+  jvmOptions: ['-Xrs']
 };
 ```
 
