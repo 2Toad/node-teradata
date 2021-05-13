@@ -28,6 +28,6 @@
     "winston": "^2.4.5"
   },
   "devDependencies": {
-    "eslint": "^7.21.0"
+    "eslint": "^5.16.0"
   }
 }
