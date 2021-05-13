@@ -1,6 +1,6 @@
 {
   "name": "node-teradata",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Teradata for Node.js",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/2Toad/node-teradata#readme",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "npm run lint",
+    "deploy": "npm publish"
   },
   "dependencies": {
     "bluebird": "^3.7.2",
@@ -26,6 +28,6 @@
     "winston": "^2.4.5"
   },
   "devDependencies": {
-    "eslint": "^7.21.0"
+    "eslint": "^5.16.0"
   }
 }
