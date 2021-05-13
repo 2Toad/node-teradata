@@ -20,10 +20,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "bluebird": "^3.7.1",
-    "jdbc": "^0.6.4",
-    "lodash": "^4.17.15",
-    "winston": "^2.4.4"
+    "bluebird": "^3.7.2",
+    "jdbc": "^0.7.4",
+    "lodash": "^4.17.21",
+    "winston": "^2.4.5"
   },
   "devDependencies": {
     "eslint": "^7.21.0"
