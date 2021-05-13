@@ -1,8 +1,8 @@
 # node-teradata
 
-[![GitHub version](https://badge.fury.io/gh/2Toad%2Fnode-teradata.svg)](https://badge.fury.io/gh/2Toad%2Fnode-teradata)
+[![GitHub version](https://badge.fury.io/gh/2Toad%2Fnode-teradata.svg)](https://github.com/2Toad/node-teradata/releases)
 [![Downloads](https://img.shields.io/npm/dm/node-teradata.svg)](https://www.npmjs.com/package/node-teradata)
-[![Build Status](https://travis-ci.org/2Toad/node-teradata.svg?branch=master)](https://travis-ci.org/2Toad/node-teradata)
+[![Build status](https://github.com/2toad/node-teradata/actions/workflows/ci.yml/badge.svg)](https://github.com/2Toad/node-teradata/actions/workflows/ci.yml)
 
 Teradata for Node.js
 
