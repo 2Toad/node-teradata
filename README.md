@@ -1,3 +1,7 @@
+> # Archived Repository 🚨
+> **This project is no longer maintained and has been archived. No further issues, PRs, or updates will be made.**
+---
+
 # node-teradata
 
 [![GitHub version](https://badge.fury.io/gh/2Toad%2Fnode-teradata.svg)](https://github.com/2Toad/node-teradata/releases)
